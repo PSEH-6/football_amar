@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.annotation.Resource;
@@ -43,22 +41,32 @@ public class LeagueServiceImpl implements LeagueService {
 		try {
 			List<LeagueVo> leagues = getLeagues();
 
-			Stream<LeagueVo> streams = leagues.stream();
+			logger.debug("got leagues " + leagues.size());
+
+			Stream<LeagueVo> streams = leagues.parallelStream();
 			// applying country filter
-			if (cName != null)
+			if (cName != null) {
+				logger.debug("applying country filter {}", cName);
 				streams = streams.filter(new CountryFilter(cName));
+
+			}
 
 			streams.forEach(new Consumer<LeagueVo>() {
 				@Override
 				public void accept(final LeagueVo vo) {
 					Integer leagueId = vo.getLeagueId();
-					System.out.println("trying leagueId: " + leagueId);
+					logger.debug("on leagueId {} ", leagueId);
+
 					try {
 						List<LeagueTeamVo> leagueTeams = getLeaguesTeamById(leagueId);
+						logger.debug("got leagueTeam {}", leagues.size());
+
 						Stream<LeagueTeamVo> leagueTeamStream = leagueTeams.parallelStream();
 						// applying team filter
-						if (tName != null)
+						if (tName != null) {
+							logger.debug("applying team filter {}", tName);
 							leagueTeamStream = leagueTeamStream.filter(new TeamFilter(tName));
+						}
 
 						leagueTeamStream.forEach(new Consumer<LeagueTeamVo>() {
 							@Override
@@ -97,6 +105,10 @@ public class LeagueServiceImpl implements LeagueService {
 				new TypeReference<List<LeagueVo>>() {
 				});
 		return leagues;
+	}
+
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
 	}
 
 }
