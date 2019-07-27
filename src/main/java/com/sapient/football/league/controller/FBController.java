@@ -1,0 +1,16 @@
+package com.sapient.football.league.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/")
+public class FBController {
+
+	@RequestMapping(path = "/hello", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+	public String hello() {
+		return "OK";
+	}
+}
